@@ -1,25 +1,22 @@
 <template>
-    <div>
+    <div class="task-list">
         <h1>Lista de Tareas</h1>
+        <!-- Formulario para agregar una nueva tarea -->
         <button @click="fetchTasks">Cargar Tareas</button>
         <div v-if="tasks.length > 0">
             <div v-for="task in tasks" :key="task.id">
-                <div>
-                    <h5 :style="{ textDecoration: task.completed ? 'line-through' : 'none' }">{{ task.todo }}</h5>
-                    <span>{{ task.completed ? 'Completada' : 'Pendiente' }}</span>
-                    <button @click="toggleTaskCompletion(task)">
-                        {{ task.completed ? 'Desmarcar' : 'Completar' }}
-                    </button>
-                    <button @click="deleteTask(task)">Eliminar</button>
-                </div>
+                <TodoItem :title="task.todo" :completed="task.completed" @toggle-completion="toggleTaskCompletion(task)" @delTodo= "deleteTask(task)" />          
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import axios from 'axios';
+import TodoItem from '../components/TodoItem.vue';
 export default {
     name: "TaskList",
+    components: {TodoItem},
     data() {
         return {
             tasks: [], // Almacenamiento local de las tareas traídas de la API
@@ -28,6 +25,14 @@ export default {
     methods: {
         // Llamada para obtener las tareas desde la API externa
         fetchTasks() {
+            axios // Usamos axios para realizar la solicitud
+                .get('https://dummyjson.com/todos') // URL de la API
+                .then((response) => {
+                    this.tasks = response.data.todos; // Almacenamos las tareas en el estado local
+                })
+                .catch((error) => {
+                    console.log(error);
+                });
             // Aquí deberían realizar la solicitud a la API usando axios o fetch.
             // La URL que usaremos es: https://dummyjson.com/todos
 
